@@ -2,7 +2,8 @@
 	background-color: black;
 	padding: 1rem;
 	color: white;
-	min-height: 400px;
+	height: calc(100vh - 7.5rem);
+	overflow: scroll;
 }
 
 .terminal-input-delimiter {

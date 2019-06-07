@@ -3,24 +3,6 @@ import { IInputPromptEntry } from '../types/input-prompt';
 
 /**
  * @description
- * Validate that a given input entry is valid.
- *
- * @param {IInputPromptEntry} entry	Input prompt entry object
- */
-export function isInputPromptEntryValid(entry: IInputPromptEntry): boolean {
-	const reply = entry.reply;
-
-	if (!reply) {
-		return false;
-	}
-
-	const isReplyNumeric = isNumeric(reply);
-
-	return isReplyNumeric || isInputPromptEntryReplyKeyword(reply);
-}
-
-/**
- * @description
  * Whether the reply string is a keyword.
  *
  * @param {string} reply	Reply string
@@ -32,7 +14,19 @@ export function isInputPromptEntryReplyKeyword(reply: string) {
 	return isReplyKeyword;
 }
 
-export function throwInvalidInputPromptEntryError(entry: IInputPromptEntry) {
-	switch (entry.state) {
-	}
+/**
+ * @description
+ * Throw frequency input error with a meaningful message to display.
+ */
+export function throwFrequencyInputError(): never {
+	throw new Error('Frequency number should be a numeric value');
+}
+
+/**
+ * @description
+ * Throw invalid input error with a meaningful message to display.
+ */
+export function throwInvalidInputError(): never {
+	const message = 'Input should be numeric or belongs to one of the following keywords e.g. halt, resume, quit';
+	throw new Error(message);
 }

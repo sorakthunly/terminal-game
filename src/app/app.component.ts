@@ -1,7 +1,12 @@
 import { Component } from '@angular/core';
+import { isNumeric } from 'validator';
 import { IInputPromptEntry } from './types/input-prompt';
 import { generateFibonacciSequence } from './utils/fibonacci';
-import { isInputPromptEntryValid, isInputPromptEntryReplyKeyword } from './utils/input-prompt-entry';
+import {
+	isInputPromptEntryReplyKeyword,
+	throwFrequencyInputError,
+	throwInvalidInputError
+} from './utils/input-prompt-entry';
 
 @Component({
 	selector: 'app-root',
@@ -42,19 +47,24 @@ export class AppComponent {
 
 	/**
 	 * @description
-	 * Throw an error for input prompt invalid entry.
-	 */
-	throwInvalidInputPromptEntry() {}
-
-	/**
-	 * @description
 	 * Submit the terminal prompt input.
 	 */
 	submit(entry: IInputPromptEntry) {
 		try {
-			const isEntryInvalid = isInputPromptEntryValid(entry);
-			if (!isEntryInvalid) {
-				this.throwInvalidInputPromptEntry();
+			if (!entry.reply) {
+				return;
+			}
+
+			const stateIsFrequency = entry.state === 'frequency';
+			const isReplyNumeric = isNumeric(entry.reply);
+			if (stateIsFrequency && !isReplyNumeric) {
+				return throwFrequencyInputError();
+			}
+
+			const isReplyKeyword = isInputPromptEntryReplyKeyword(entry.reply);
+			const isReplyValid = isReplyNumeric || isReplyKeyword;
+			if (!stateIsFrequency && !isReplyValid) {
+				return throwInvalidInputError();
 			}
 
 			entry.isComplete = true;
@@ -69,7 +79,6 @@ export class AppComponent {
 
 				case 'initial':
 				case 'in-progress':
-					const isReplyKeyword = isInputPromptEntryReplyKeyword(entry.reply);
 					this.inputPromptEntries.push({
 						state: 'in-progress',
 						isComplete: false
