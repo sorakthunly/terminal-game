@@ -7,7 +7,8 @@ import { generateFibonacciSequence } from './utils/fibonacci';
 import {
 	isInputPromptEntryReplyKeyword,
 	throwFrequencyInputError,
-	throwInvalidInputError
+	throwInputError,
+	throwInitialInputError
 } from './utils/input-prompt-entry';
 
 @Component({
@@ -19,11 +20,14 @@ export class AppComponent {
 	/** Array of the first 1,000 fibonacci sequence */
 	fibonacciSequence: Array<number>;
 
-	/** Frequency value as input by user */
-	frequencyValue: number;
+	/** Frequency value as input by user converted to milliseconds */
+	frequencyInMilliseconds: number;
 
 	/** State of the input prompt */
 	inputPromptEntries: Array<IInputPromptEntry>;
+
+	/** Whether the game is complete */
+	isGameComplete: boolean;
 
 	/** Time counted in milliseconds */
 	time: number;
@@ -39,9 +43,18 @@ export class AppComponent {
 	 * Instantiate the component.
 	 */
 	constructor() {
+		this.initialiseTime();
 		this.subcribeToTimeObservable();
 		this.initialiseTerminalInputEntries();
 		this.prepareFibonacciSequence();
+	}
+
+	/**
+	 * @description
+	 * Initialise the time counter.
+	 */
+	initialiseTime() {
+		this.time = 0;
 	}
 
 	/**
@@ -53,9 +66,10 @@ export class AppComponent {
 		this.time$.subscribe(time => {
 			this.time += time;
 
-			const timeInSeconds = time / 1000;
-			const frequencyValue = this.frequencyValue;
-			const shouldOutputMessage = timeInSeconds % frequencyValue;
+			const canStartOutputting = this.time >= this.frequencyInMilliseconds;
+			const timeIsMultiplierOfFrequencyInput = this.time % this.frequencyInMilliseconds === 0;
+			const shouldOutputMessage = canStartOutputting && timeIsMultiplierOfFrequencyInput;
+
 			if (shouldOutputMessage) {
 				const lastInputPromptEntry = last(this.inputPromptEntries);
 				lastInputPromptEntry.messages = lastInputPromptEntry.messages || [];
@@ -71,14 +85,27 @@ export class AppComponent {
 	generateInputMessage(): string {
 		const entryCounts: Array<IInputPromptEntryCount> = [];
 
-		this.inputPromptEntries.forEach(entry => {
+		const validInputPromptEntries = this.inputPromptEntries.filter(entry => {
+			const reply = entry.reply;
+			if (!reply) {
+				return false;
+			}
+
+			const isReplyNumeric = isNumeric(reply);
+			const isNotFrequencyInput = entry.state !== 'frequency';
+			const isValidEntry = isReplyNumeric && isNotFrequencyInput;
+
+			return isValidEntry ? entry : false;
+		});
+
+		validInputPromptEntries.forEach(entry => {
 			const value = entry.reply;
 			const entryCount = entryCounts.find(count => count.value === value);
 			entryCount ? entryCount.frequency++ : entryCounts.push({ frequency: 1, value });
 		});
 
 		const message = entryCounts
-			.sort((a, b) => a.frequency - b.frequency)
+			.sort((a, b) => b.frequency - a.frequency)
 			.map(entryCount => `${entryCount.value}:${entryCount.frequency.toString()}`)
 			.join(', ');
 
@@ -107,31 +134,36 @@ export class AppComponent {
 	 */
 	submit(entry: IInputPromptEntry) {
 		try {
-			if (!entry.reply) {
+			const reply = entry.reply;
+			if (!reply) {
 				return;
 			}
 
-			const stateIsFrequency = entry.state === 'frequency';
+			const isReplyNumeric = isNumeric(reply);
+			const isReplyZero = Number(reply) === 0;
+			const isValidNumericInput = isReplyNumeric && !isReplyZero;
 
-			const isReplyNumeric = isNumeric(entry.reply);
-			const isReplyZero = Number(entry.reply) === 0;
-			const isFrequencyReplyValid = stateIsFrequency && isReplyNumeric && !isReplyZero;
-			if (!isFrequencyReplyValid) {
+			const stateIsFrequency = entry.state === 'frequency';
+			if (stateIsFrequency && !isValidNumericInput) {
 				return throwFrequencyInputError();
 			}
 
-			const isReplyKeyword = isInputPromptEntryReplyKeyword(entry.reply);
-			const isReplyValid = isReplyNumeric || isReplyKeyword;
-			const isNonFrequencyReplyValid = !stateIsFrequency && isReplyValid;
-			if (!isNonFrequencyReplyValid) {
-				return throwInvalidInputError();
+			const stateIsInitial = entry.state === 'initial';
+			if (stateIsInitial && !isValidNumericInput) {
+				return throwInitialInputError();
+			}
+
+			const isReplyKeyword = isInputPromptEntryReplyKeyword(reply);
+			const isValidInput = isReplyNumeric || isReplyKeyword;
+			if (!stateIsFrequency && !isValidInput) {
+				return throwInputError();
 			}
 
 			entry.isComplete = true;
 
 			switch (entry.state) {
 				case 'frequency':
-					this.frequencyValue = Number(entry.reply);
+					this.frequencyInMilliseconds = Number(reply) * 1000;
 					this.addNewInputPromptEntry('initial');
 					break;
 
@@ -141,11 +173,41 @@ export class AppComponent {
 					break;
 
 				case 'in-progress':
+					if (reply === 'halt') {
+						this.stopTimer();
+					}
 					this.addNewInputPromptEntry('in-progress');
 					break;
 			}
 		} catch (error) {
 			this.handleInputPromptEntryError(entry, error);
+		}
+	}
+
+	/**
+	 * @description
+	 * Handle the the input prompt entry on a regular input case.
+	 */
+	handleInputPromptEntry(entry: IInputPromptEntry) {
+		switch (entry.reply) {
+			case 'halt':
+				this.stopTimer();
+				this.addNewInputPromptEntry('halted');
+				break;
+
+			case 'resume':
+				this.startTimer();
+				this.addNewInputPromptEntry('resumed');
+				break;
+
+			case 'quit':
+				this.stopTimer();
+				this.addNewInputPromptEntry('quit');
+				break;
+
+			default:
+				this.addNewInputPromptEntry('in-progress');
+				break;
 		}
 	}
 
@@ -177,9 +239,9 @@ export class AppComponent {
 	 * @description
 	 * Start the time counter.
 	 *
-	 * @param {number} interval	Defaulted to counting every millisecond
+	 * @param {number} interval Interval to count in milliseconds, defaulted to ten
 	 */
-	startTimer(interval: number = 1) {
+	startTimer(interval: number = 10) {
 		this.timerInterval = setInterval(() => {
 			this.time$.next(interval);
 		}, interval);
@@ -189,7 +251,7 @@ export class AppComponent {
 	 * @description
 	 * Stop the timer counter.
 	 */
-	stopCounter() {
+	stopTimer() {
 		clearInterval(this.timerInterval);
 	}
 }
