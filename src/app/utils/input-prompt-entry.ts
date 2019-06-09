@@ -1,6 +1,3 @@
-import { isNumeric } from 'validator';
-import { IInputPromptEntry } from '../types/input-prompt';
-
 /**
  * @description
  * Whether the reply string is a keyword.

@@ -19,10 +19,16 @@
 				</ng-container>
 			</h6>
 
+			<ng-container *ngIf="entry.messages && entry.messages.length">
+				<p *ngFor="let message of entry.messages" class="text-success">Logged: {{ message }}</p>
+			</ng-container>
+
 			<form (submit)="submit(entry)">
 				<div class="d-flex align-items-center justify-content-start">
 					<span class="font-weight-bold terminal-input-delimiter">>></span>
-					<span *ngIf="entry.isComplete" class="terminal-completed-input"> {{ entry.reply }}</span>
+					<span *ngIf="entry.isComplete" class="terminal-completed-input" [class.text-danger]="entry.replyErrorMessage">
+						{{ entry.reply }}</span
+					>
 					<input
 						*ngIf="!entry.isComplete"
 						appAutoFocus
@@ -34,6 +40,7 @@
 					/>
 				</div>
 			</form>
+			<p *ngIf="entry.replyErrorMessage" class="small text-muted">({{ entry.replyErrorMessage }})</p>
 		</div>
 	</div>
 </div>

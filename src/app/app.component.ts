@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
+import { clone, last } from 'lodash';
+import { BehaviorSubject } from 'rxjs';
 import { isNumeric } from 'validator';
-import { IInputPromptEntry } from './types/input-prompt';
+import { IInputPromptEntry, TInputPromptState, IInputPromptEntryCount } from './types/input-prompt';
 import { generateFibonacciSequence } from './utils/fibonacci';
 import {
 	isInputPromptEntryReplyKeyword,
@@ -17,16 +19,70 @@ export class AppComponent {
 	/** Array of the first 1,000 fibonacci sequence */
 	fibonacciSequence: Array<number>;
 
+	/** Frequency value as input by user */
+	frequencyValue: number;
+
 	/** State of the input prompt */
 	inputPromptEntries: Array<IInputPromptEntry>;
+
+	/** Time counted in milliseconds */
+	time: number;
+
+	/** Time behaviour subject to update the time value */
+	time$: BehaviorSubject<number> = new BehaviorSubject(0);
+
+	/** Application timer setInterval */
+	timerInterval;
 
 	/**
 	 * @description
 	 * Instantiate the component.
 	 */
 	constructor() {
+		this.subcribeToTimeObservable();
 		this.initialiseTerminalInputEntries();
 		this.prepareFibonacciSequence();
+	}
+
+	/**
+	 * @description
+	 * Initialise the time observable. And check that if time
+	 * is divisible by the frequency input
+	 */
+	subcribeToTimeObservable() {
+		this.time$.subscribe(time => {
+			this.time += time;
+
+			const timeInSeconds = time / 1000;
+			const frequencyValue = this.frequencyValue;
+			const shouldOutputMessage = timeInSeconds % frequencyValue;
+			if (shouldOutputMessage) {
+				const lastInputPromptEntry = last(this.inputPromptEntries);
+				lastInputPromptEntry.messages = lastInputPromptEntry.messages || [];
+				lastInputPromptEntry.messages.push(this.generateInputMessage());
+			}
+		});
+	}
+
+	/**
+	 * @description
+	 * Generate output message.
+	 */
+	generateInputMessage(): string {
+		const entryCounts: Array<IInputPromptEntryCount> = [];
+
+		this.inputPromptEntries.forEach(entry => {
+			const value = entry.reply;
+			const entryCount = entryCounts.find(count => count.value === value);
+			entryCount ? entryCount.frequency++ : entryCounts.push({ frequency: 1, value });
+		});
+
+		const message = entryCounts
+			.sort((a, b) => a.frequency - b.frequency)
+			.map(entryCount => `${entryCount.value}:${entryCount.frequency.toString()}`)
+			.join(', ');
+
+		return message;
 	}
 
 	/**
@@ -56,14 +112,18 @@ export class AppComponent {
 			}
 
 			const stateIsFrequency = entry.state === 'frequency';
+
 			const isReplyNumeric = isNumeric(entry.reply);
-			if (stateIsFrequency && !isReplyNumeric) {
+			const isReplyZero = Number(entry.reply) === 0;
+			const isFrequencyReplyValid = stateIsFrequency && isReplyNumeric && !isReplyZero;
+			if (!isFrequencyReplyValid) {
 				return throwFrequencyInputError();
 			}
 
 			const isReplyKeyword = isInputPromptEntryReplyKeyword(entry.reply);
 			const isReplyValid = isReplyNumeric || isReplyKeyword;
-			if (!stateIsFrequency && !isReplyValid) {
+			const isNonFrequencyReplyValid = !stateIsFrequency && isReplyValid;
+			if (!isNonFrequencyReplyValid) {
 				return throwInvalidInputError();
 			}
 
@@ -71,22 +131,65 @@ export class AppComponent {
 
 			switch (entry.state) {
 				case 'frequency':
-					this.inputPromptEntries.push({
-						state: 'initial',
-						isComplete: false
-					});
+					this.frequencyValue = Number(entry.reply);
+					this.addNewInputPromptEntry('initial');
 					break;
 
 				case 'initial':
+					this.addNewInputPromptEntry('in-progress');
+					this.startTimer();
+					break;
+
 				case 'in-progress':
-					this.inputPromptEntries.push({
-						state: 'in-progress',
-						isComplete: false
-					});
+					this.addNewInputPromptEntry('in-progress');
 					break;
 			}
-		} catch (err) {
-			alert(err.message);
+		} catch (error) {
+			this.handleInputPromptEntryError(entry, error);
 		}
+	}
+
+	/**
+	 * @description
+	 * Add new input prompt entry.
+	 */
+	addNewInputPromptEntry(state: TInputPromptState) {
+		this.inputPromptEntries.push({ state, isComplete: false });
+	}
+
+	/**
+	 * @description
+	 * Handle error on an input prompt entry validation.
+	 * This should mark the current entry as complete and add a new
+	 * empty entry to the terminal.
+	 */
+	handleInputPromptEntryError(entry: IInputPromptEntry, error: Error) {
+		const clonedEntry = clone(entry);
+		clonedEntry.reply = undefined;
+
+		entry.isComplete = true;
+		entry.replyErrorMessage = error.message;
+
+		this.inputPromptEntries.push(clonedEntry);
+	}
+
+	/**
+	 * @description
+	 * Start the time counter.
+	 *
+	 * @param {number} interval	Defaulted to counting every millisecond
+	 */
+	startTimer(interval: number = 1) {
+		this.timerInterval = setInterval(() => {
+			this.time$.next(interval);
+		}, interval);
+	}
+
+	/**
+	 * @description
+	 * Stop the timer counter.
+	 */
+	stopCounter() {
+		clearInterval(this.timerInterval);
 	}
 }
