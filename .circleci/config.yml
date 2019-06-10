@@ -6,9 +6,6 @@ jobs:
       - image: circleci/node:12.4.0-browsers
     steps:
       - checkout
-      - run:
-        name: Show current branch
-        command: echo ${CIRCLE_BRANCH}
       - restore_cache:
         keys: v1-dependencies-{{ checksum "package.json" }}
       - run:
@@ -32,9 +29,6 @@ jobs:
     docker:
       - image: circleci/node:12.4.0-browsers
     steps:
-      - run:
-        name: Show current branch
-        command: echo ${CIRCLE_BRANCH}
       - restore_cache:
           key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
       - run:
