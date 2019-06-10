@@ -1,42 +1,42 @@
 version: 2
 jobs:
-	build:
-		steps:
-			- checkout
-			- run:
-				name: Show current branch
-				command: echo ${CIRCLE_BRANCH}
-			- restore_cache:
-				keys: v1-dependencies-{{ checksum "package.json" }}
-			- run:
-				name: Install Dependencies
-				command: npm install
-			- run:
-				name: Linting
-				command: npm run lint
-			- run:
-				name: Building
-				command: npm run build --prod
-			- save_cache:
-				key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
-				paths:
-					- dist
-					- package.json
-					- firebase.json
-					- .firebaserc
-	deploy:
-		steps:
-			- run:
-				name: Show current branch
-				command: echo ${CIRCLE_BRANCH}
-			- restore_cache:
-                key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
-			- run:
-                name: Install Firebase
-                command: npm install --save-dev firebase-tools
-            - run:
-                name: Deploy Master to Firebase
-                command: npm run firebase-deploy
+  build:
+    steps:
+      - checkout
+      - run:
+        name: Show current branch
+        command: echo ${CIRCLE_BRANCH}
+      - restore_cache:
+        keys: v1-dependencies-{{ checksum "package.json" }}
+      - run:
+        name: Install Dependencies
+        command: npm install
+      - run:
+        name: Linting
+        command: npm run lint
+      - run:
+        name: Building
+        command: npm run build --prod
+      - save_cache:
+        key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+        paths:
+          - dist
+          - package.json
+          - firebase.json
+          - .firebaserc
+  deploy:
+    steps:
+      - run:
+        name: Show current branch
+        command: echo ${CIRCLE_BRANCH}
+      - restore_cache:
+          key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+      - run:
+          name: Install Firebase
+          command: npm install --save-dev firebase-tools
+      - run:
+          name: Deploy Master to Firebase
+          command: npm run firebase-deploy
 
 workflows:
     version: 2
@@ -45,7 +45,8 @@ workflows:
         - build
         - deploy:
             requires:
-                - build
+              - build
             filters:
-                branches:
-                    only: master
+              branches:
+                  only: master
+                  
