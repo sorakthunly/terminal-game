@@ -20,10 +20,15 @@ export class TerminalEntryFormComponent {
 	/**
 	 * @description
 	 * Listen to any click event on the page to autofocus the input element.
+	 * Wrap the focus invoker so that when the input is not shown after the
+	 * entry is marked as complete, it does not attempt to focus a non-existent
+	 * element.
 	 */
 	@HostListener('document:click', ['$event'])
 	clickout() {
-		this.terminalInput.nativeElement.focus();
+		if (this.terminalInput) {
+			this.terminalInput.nativeElement.focus();
+		}
 	}
 
 	/**

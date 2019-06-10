@@ -1,0 +1,12 @@
+{
+	"hosting": {
+		"public": "dist/terminal-game",
+		"ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+		"rewrites": [
+			{
+				"source": "**",
+				"destination": "/index.html"
+			}
+		]
+	}
+}

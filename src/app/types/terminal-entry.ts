@@ -1,3 +1,5 @@
+export type TTerminalEntryState = 'frequency' | 'initial' | 'in-progress' | 'halted' | 'resumed' | 'quit';
+
 export interface ITerminalEntry {
 	state: TTerminalEntryState;
 	isComplete: boolean;
@@ -11,5 +13,3 @@ export interface ITerminalEntryCount {
 	value: string;
 	frequency: number;
 }
-
-export type TTerminalEntryState = 'frequency' | 'initial' | 'in-progress' | 'halted' | 'resumed' | 'quit';

@@ -1,17 +1,12 @@
 import { Component } from '@angular/core';
 import { clone, last } from 'lodash';
-import { BehaviorSubject } from 'rxjs';
-import { isNumeric } from 'validator';
 import { TimerService } from './services/timer.service';
-import { ITerminalEntry, TTerminalEntryState, ITerminalEntryCount } from './types/terminal-entry';
-import { generateFibonacciSequence } from './utils/fibonacci';
-import {
-	isTerminalEntryReplyKeyword,
-	throwFrequencyInputError,
-	throwInputError,
-	throwInitialInputError,
-	generateTerminalMessage
-} from './utils/terminal-entry';
+import { ITerminalEntry, TTerminalEntryState } from './types/terminal-entry';
+import { fromSecondsToMilliseconds } from './utils/converters';
+import { generateFibonacciSequence, isFibonacci } from './utils/fibonacci';
+import { throwFrequencyInputError, throwInitialInputError, throwInputError } from './utils/input-errors';
+import { isInvalidFrequencyEntry, isInvalidInitialEntry, isInvalidNonFrequencyEntry } from './utils/input-validators';
+import { generateTerminalMessage } from './utils/terminal-entry-message';
 
 @Component({
 	selector: 'app-root',
@@ -39,16 +34,6 @@ export class AppComponent {
 		this.initialiseTimer();
 		this.initialiseTerminalInputEntries();
 		this.prepareFibonacciSequence();
-	}
-
-	/**
-	 * @description
-	 * Reset the state of the application.
-	 */
-	resetState() {
-		this.frequencyInMilliseconds = 0;
-		this.timeInMilliseconds = 0;
-		this.initialiseTerminalInputEntries();
 	}
 
 	/**
@@ -94,6 +79,17 @@ export class AppComponent {
 
 	/**
 	 * @description
+	 * Reset the state of the application.
+	 */
+	resetState() {
+		this.frequencyInMilliseconds = 0;
+		this.timeInMilliseconds = 0;
+		this.timerService.stopTimer();
+		this.initialiseTerminalInputEntries();
+	}
+
+	/**
+	 * @description
 	 * Submit the terminal entry. First validate that the input is valid
 	 * before handling the entry object.
 	 *
@@ -101,28 +97,22 @@ export class AppComponent {
 	 */
 	submit(entry: ITerminalEntry) {
 		try {
-			const reply = entry.reply;
-			if (!reply) {
+			if (!entry.reply) {
 				return;
 			}
 
-			const isReplyNumeric = isNumeric(reply);
-			const isReplyZero = Number(reply) === 0;
-			const isValidNumericInput = isReplyNumeric && !isReplyZero;
-
-			const stateIsFrequency = entry.state === 'frequency';
-			if (stateIsFrequency && !isValidNumericInput) {
+			const isFrequencyEntryInvalid = isInvalidFrequencyEntry(entry);
+			if (isFrequencyEntryInvalid) {
 				return throwFrequencyInputError();
 			}
 
-			const stateIsInitial = entry.state === 'initial';
-			if (stateIsInitial && !isValidNumericInput) {
+			const isInitialEntryInvalid = isInvalidInitialEntry(entry);
+			if (isInitialEntryInvalid) {
 				return throwInitialInputError();
 			}
 
-			const isReplyKeyword = isTerminalEntryReplyKeyword(reply);
-			const isValidInput = isReplyNumeric || isReplyKeyword;
-			if (!stateIsFrequency && !isValidInput) {
+			const isNonFrequencyEntryInvalid = isInvalidNonFrequencyEntry(entry);
+			if (isNonFrequencyEntryInvalid) {
 				return throwInputError();
 			}
 
@@ -142,9 +132,10 @@ export class AppComponent {
 	handleTerminalEntrySubmit(entry: ITerminalEntry) {
 		entry.isComplete = true;
 
-		const isReplyNumeric = isNumeric(entry.reply);
-		const isReplyFibonacci = isReplyNumeric && this.fibonacciSequence.indexOf(Number(entry.reply)) > -1;
-		entry.isReplyFibonacci = isReplyFibonacci;
+		const isStateFrequency = entry.state === 'frequency';
+		if (!isStateFrequency) {
+			entry.isReplyFibonacci = isFibonacci(entry.reply, this.fibonacciSequence);
+		}
 
 		const isReplyQuit = entry.reply === 'quit';
 		if (isReplyQuit) {
@@ -156,7 +147,7 @@ export class AppComponent {
 		switch (entry.state) {
 			case 'frequency':
 				this.addNewTerminalEntry('initial');
-				this.frequencyInMilliseconds = Number(entry.reply) * 1000;
+				this.frequencyInMilliseconds = fromSecondsToMilliseconds(entry.reply);
 				break;
 
 			case 'initial':
