@@ -1,15 +1,15 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { IInputPromptEntry } from 'src/app/types/input-prompt';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { ITerminalEntry } from 'src/app/types/terminal-entry';
 
 @Component({
 	selector: 'app-terminal-entry',
 	templateUrl: './terminal-entry.component.html',
 	styleUrls: ['./terminal-entry.component.scss']
 })
-export class TerminalEntryComponent implements OnInit {
-	@Input() inputPromptEntry: IInputPromptEntry;
+export class TerminalEntryComponent {
+	/** A terminal entry object */
+	@Input() terminalEntry: ITerminalEntry;
 
-	constructor() {}
-
-	ngOnInit() {}
+	/** Submit event on user input completion */
+	@Output() submit: EventEmitter<ITerminalEntry> = new EventEmitter();
 }

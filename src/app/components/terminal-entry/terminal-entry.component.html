@@ -1,40 +1,6 @@
 <div class="mb-4">
-	<h6>
-		<ng-container [ngSwitch]="inputPromptEntry.state">
-			<span *ngSwitchCase="'frequency'">
-				Please input the number of time in seconds between emitting numbers and their frequency
-			</span>
-			<span *ngSwitchCase="'initial'">Please enter the first number</span>
-			<span *ngSwitchCase="'in-progress'">Please enter the next number</span>
-			<span *ngSwitchCase="'halted'">Timer halted</span>
-			<span *ngSwitchCase="'resumed'">Timer resumed</span>
-		</ng-container>
-	</h6>
-
-	<ng-container *ngIf="inputPromptEntry.messages && inputPromptEntry.messages.length">
-		<p *ngFor="let message of inputPromptEntry.messages" class="text-success">Logged: {{ message }}</p>
-	</ng-container>
-
-	<form (submit)="submit(inputPromptEntry)">
-		<div class="d-flex align-items-center justify-content-start">
-			<span class="font-weight-bold terminal-input-delimiter">>></span>
-			<span
-				*ngIf="inputPromptEntry.isComplete"
-				class="terminal-completed-input"
-				[class.text-danger]="inputPromptEntry.replyErrorMessage"
-			>
-				{{ inputPromptEntry.reply }}</span
-			>
-			<input
-				*ngIf="!inputPromptEntry.isComplete"
-				appAutoFocus
-				type="text"
-				class="w-100 terminal-line-input"
-				name="reply"
-				autocomplete="off"
-				[(ngModel)]="inputPromptEntry.reply"
-			/>
-		</div>
-	</form>
-	<p *ngIf="inputPromptEntry.replyErrorMessage" class="small text-muted">({{ inputPromptEntry.replyErrorMessage }})</p>
+	<app-terminal-entry-question [terminalEntry]="terminalEntry"></app-terminal-entry-question>
+	<app-terminal-entry-log [messages]="terminalEntry.messages"></app-terminal-entry-log>
+	<app-terminal-entry-form [terminalEntry]="terminalEntry" (submit)="submit.emit($event)"></app-terminal-entry-form>
+	<app-terminal-entry-error [message]="terminalEntry.replyErrorMessage"></app-terminal-entry-error>
 </div>

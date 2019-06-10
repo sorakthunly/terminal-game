@@ -1,0 +1,19 @@
+.terminal-input-delimiter {
+	color: green;
+}
+
+.terminal-line-input {
+	padding: 0 0.5rem;
+	background-color: black;
+	border: 0;
+	color: white;
+
+	&:focus {
+		outline: none;
+	}
+}
+
+.terminal-completed-input {
+	padding: 0 0.5rem;
+	color: #28c1f3;
+}

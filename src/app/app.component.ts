@@ -2,14 +2,16 @@ import { Component } from '@angular/core';
 import { clone, last } from 'lodash';
 import { BehaviorSubject } from 'rxjs';
 import { isNumeric } from 'validator';
-import { IInputPromptEntry, TInputPromptState, IInputPromptEntryCount } from './types/input-prompt';
+import { TimerService } from './services/timer.service';
+import { ITerminalEntry, TTerminalEntryState, ITerminalEntryCount } from './types/terminal-entry';
 import { generateFibonacciSequence } from './utils/fibonacci';
 import {
-	isInputPromptEntryReplyKeyword,
+	isTerminalEntryReplyKeyword,
 	throwFrequencyInputError,
 	throwInputError,
-	throwInitialInputError
-} from './utils/input-prompt-entry';
+	throwInitialInputError,
+	generateTerminalMessage
+} from './utils/terminal-entry';
 
 @Component({
 	selector: 'app-root',
@@ -24,92 +26,54 @@ export class AppComponent {
 	frequencyInMilliseconds: number;
 
 	/** State of the input prompt */
-	inputPromptEntries: Array<IInputPromptEntry>;
-
-	/** Whether the game is complete */
-	isGameComplete: boolean;
+	terminalEntries: Array<ITerminalEntry>;
 
 	/** Time counted in milliseconds */
-	time: number;
-
-	/** Time behaviour subject to update the time value */
-	time$: BehaviorSubject<number> = new BehaviorSubject(0);
-
-	/** Application timer setInterval */
-	timerInterval;
+	timeInMilliseconds: number;
 
 	/**
 	 * @description
 	 * Instantiate the component.
 	 */
-	constructor() {
-		this.initialiseTime();
-		this.subcribeToTimeObservable();
+	constructor(private timerService: TimerService) {
+		this.initialiseTimer();
 		this.initialiseTerminalInputEntries();
 		this.prepareFibonacciSequence();
 	}
 
 	/**
 	 * @description
-	 * Initialise the time counter.
+	 * Reset the state of the application.
 	 */
-	initialiseTime() {
-		this.time = 0;
+	resetState() {
+		this.frequencyInMilliseconds = 0;
+		this.timeInMilliseconds = 0;
+		this.initialiseTerminalInputEntries();
 	}
 
 	/**
 	 * @description
-	 * Initialise the time observable. And check that if time
-	 * is divisible by the frequency input
+	 * Initialise the time counter. Subscribe to the timer service time observable
+	 * and check that if time is divisible by the frequency input.
 	 */
-	subcribeToTimeObservable() {
-		this.time$.subscribe(time => {
-			this.time += time;
+	initialiseTimer() {
+		this.timeInMilliseconds = 0;
 
-			const canStartOutputting = this.time >= this.frequencyInMilliseconds;
-			const timeIsMultiplierOfFrequencyInput = this.time % this.frequencyInMilliseconds === 0;
+		this.timerService.time$.subscribe(intervalTime => {
+			this.timeInMilliseconds += intervalTime;
+
+			const canStartOutputting = this.timeInMilliseconds >= this.frequencyInMilliseconds;
+			const timeIsMultiplierOfFrequencyInput = this.timeInMilliseconds % this.frequencyInMilliseconds === 0;
 			const shouldOutputMessage = canStartOutputting && timeIsMultiplierOfFrequencyInput;
 
 			if (shouldOutputMessage) {
-				const lastInputPromptEntry = last(this.inputPromptEntries);
+				const lastInputPromptEntry = last(this.terminalEntries);
 				lastInputPromptEntry.messages = lastInputPromptEntry.messages || [];
-				lastInputPromptEntry.messages.push(this.generateInputMessage());
+
+				const terminalMessage = generateTerminalMessage(this.terminalEntries);
+				lastInputPromptEntry.messages.push(terminalMessage);
 			}
 		});
-	}
-
-	/**
-	 * @description
-	 * Generate output message.
-	 */
-	generateInputMessage(): string {
-		const entryCounts: Array<IInputPromptEntryCount> = [];
-
-		const validInputPromptEntries = this.inputPromptEntries.filter(entry => {
-			const reply = entry.reply;
-			if (!reply) {
-				return false;
-			}
-
-			const isReplyNumeric = isNumeric(reply);
-			const isNotFrequencyInput = entry.state !== 'frequency';
-			const isValidEntry = isReplyNumeric && isNotFrequencyInput;
-
-			return isValidEntry ? entry : false;
-		});
-
-		validInputPromptEntries.forEach(entry => {
-			const value = entry.reply;
-			const entryCount = entryCounts.find(count => count.value === value);
-			entryCount ? entryCount.frequency++ : entryCounts.push({ frequency: 1, value });
-		});
-
-		const message = entryCounts
-			.sort((a, b) => b.frequency - a.frequency)
-			.map(entryCount => `${entryCount.value}:${entryCount.frequency.toString()}`)
-			.join(', ');
-
-		return message;
 	}
 
 	/**
@@ -117,7 +81,7 @@ export class AppComponent {
 	 * Initialise terminal entry.
 	 */
 	initialiseTerminalInputEntries() {
-		this.inputPromptEntries = [{ state: 'frequency', isComplete: false }];
+		this.terminalEntries = [{ state: 'frequency', isComplete: false }];
 	}
 
 	/**
@@ -130,9 +94,12 @@ export class AppComponent {
 
 	/**
 	 * @description
-	 * Submit the terminal prompt input.
+	 * Submit the terminal entry. First validate that the input is valid
+	 * before handling the entry object.
+	 *
+	 * @param {ITerminalEntry} entry	Terminal entry object
 	 */
-	submit(entry: IInputPromptEntry) {
+	submit(entry: ITerminalEntry) {
 		try {
 			const reply = entry.reply;
 			if (!reply) {
@@ -153,34 +120,58 @@ export class AppComponent {
 				return throwInitialInputError();
 			}
 
-			const isReplyKeyword = isInputPromptEntryReplyKeyword(reply);
+			const isReplyKeyword = isTerminalEntryReplyKeyword(reply);
 			const isValidInput = isReplyNumeric || isReplyKeyword;
 			if (!stateIsFrequency && !isValidInput) {
 				return throwInputError();
 			}
 
-			entry.isComplete = true;
-
-			switch (entry.state) {
-				case 'frequency':
-					this.frequencyInMilliseconds = Number(reply) * 1000;
-					this.addNewInputPromptEntry('initial');
-					break;
-
-				case 'initial':
-					this.addNewInputPromptEntry('in-progress');
-					this.startTimer();
-					break;
-
-				case 'in-progress':
-					if (reply === 'halt') {
-						this.stopTimer();
-					}
-					this.addNewInputPromptEntry('in-progress');
-					break;
-			}
+			this.handleTerminalEntrySubmit(entry);
 		} catch (error) {
-			this.handleInputPromptEntryError(entry, error);
+			this.handleTerminalEntryError(entry, error);
+		}
+	}
+
+	/**
+	 * @description
+	 * Handle the entry submission. Update each entry state and append
+	 * a new entry (new question) accordingly for the user to reply.
+	 *
+	 * @param {ITerminalEntry} entry	Terminal entry object
+	 */
+	handleTerminalEntrySubmit(entry: ITerminalEntry) {
+		entry.isComplete = true;
+
+		const isReplyNumeric = isNumeric(entry.reply);
+		const isReplyFibonacci = isReplyNumeric && this.fibonacciSequence.indexOf(Number(entry.reply)) > -1;
+		entry.isReplyFibonacci = isReplyFibonacci;
+
+		const isReplyQuit = entry.reply === 'quit';
+		if (isReplyQuit) {
+			alert('You have quitted the game');
+
+			return this.resetState();
+		}
+
+		switch (entry.state) {
+			case 'frequency':
+				this.addNewTerminalEntry('initial');
+				this.frequencyInMilliseconds = Number(entry.reply) * 1000;
+				break;
+
+			case 'initial':
+				this.addNewTerminalEntry('in-progress');
+				this.timerService.startTimer();
+				break;
+
+			case 'in-progress':
+			case 'resumed':
+				this.handleTerminalInProgressEntry(entry);
+				break;
+
+			case 'halted':
+				this.handleTerminalHaltedEntry(entry);
+				break;
 		}
 	}
 
@@ -188,25 +179,34 @@ export class AppComponent {
 	 * @description
 	 * Handle the the input prompt entry on a regular input case.
 	 */
-	handleInputPromptEntry(entry: IInputPromptEntry) {
+	handleTerminalInProgressEntry(entry: ITerminalEntry) {
 		switch (entry.reply) {
 			case 'halt':
-				this.stopTimer();
-				this.addNewInputPromptEntry('halted');
-				break;
-
-			case 'resume':
-				this.startTimer();
-				this.addNewInputPromptEntry('resumed');
-				break;
-
-			case 'quit':
-				this.stopTimer();
-				this.addNewInputPromptEntry('quit');
+				this.addNewTerminalEntry('halted');
+				this.timerService.stopTimer();
 				break;
 
 			default:
-				this.addNewInputPromptEntry('in-progress');
+				this.addNewTerminalEntry('in-progress');
+				break;
+		}
+	}
+
+	/**
+	 * @description
+	 * Handle the the input prompt entry on a halted input case.
+	 */
+	handleTerminalHaltedEntry(entry: ITerminalEntry) {
+		switch (entry.reply) {
+			case 'resume':
+				this.addNewTerminalEntry('resumed');
+				if (this.timerService.isPaused) {
+					this.timerService.startTimer();
+				}
+				break;
+
+			default:
+				this.addNewTerminalEntry('halted');
 				break;
 		}
 	}
@@ -215,8 +215,8 @@ export class AppComponent {
 	 * @description
 	 * Add new input prompt entry.
 	 */
-	addNewInputPromptEntry(state: TInputPromptState) {
-		this.inputPromptEntries.push({ state, isComplete: false });
+	addNewTerminalEntry(state: TTerminalEntryState) {
+		this.terminalEntries.push({ state, isComplete: false });
 	}
 
 	/**
@@ -225,33 +225,13 @@ export class AppComponent {
 	 * This should mark the current entry as complete and add a new
 	 * empty entry to the terminal.
 	 */
-	handleInputPromptEntryError(entry: IInputPromptEntry, error: Error) {
+	handleTerminalEntryError(entry: ITerminalEntry, error: Error) {
 		const clonedEntry = clone(entry);
 		clonedEntry.reply = undefined;
 
 		entry.isComplete = true;
 		entry.replyErrorMessage = error.message;
 
-		this.inputPromptEntries.push(clonedEntry);
-	}
-
-	/**
-	 * @description
-	 * Start the time counter.
-	 *
-	 * @param {number} interval Interval to count in milliseconds, defaulted to ten
-	 */
-	startTimer(interval: number = 10) {
-		this.timerInterval = setInterval(() => {
-			this.time$.next(interval);
-		}, interval);
-	}
-
-	/**
-	 * @description
-	 * Stop the timer counter.
-	 */
-	stopTimer() {
-		clearInterval(this.timerInterval);
+		this.terminalEntries.push(clonedEntry);
 	}
 }

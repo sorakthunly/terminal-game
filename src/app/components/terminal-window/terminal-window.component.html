@@ -1,6 +1,7 @@
 <div class="terminal-window">
 	<app-terminal-entry
-		*ngFor="let inputPromptEntry of inputPromptEntries"
-		[inputPromptEntry]="inputPromptEntry"
+		*ngFor="let terminalEntry of terminalEntries"
+		[terminalEntry]="terminalEntry"
+		(submit)="submit.emit($event)"
 	></app-terminal-entry>
 </div>
