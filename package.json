@@ -5,11 +5,14 @@
 		"ng": "ng",
 		"start": "ng serve",
 		"build": "ng build",
-		"test": "ng test",
-		"tslint": "tslint --format stylish --fix --project tsconfig.json \"{*,src/**/*}.ts\"",
-		"prettier": "prettier --config .prettierrc --write \"{*,src/**/*}.+(ts|js|md|html)\"",
+		"build:prod": "ng build --prod",
+		"deploy:firebase": "firebase deploy",
+		"e2e": "ng e2e",
 		"lint": "npm run prettier && npm run tslint",
-		"e2e": "ng e2e"
+		"prettier": "prettier --config .prettierrc --write \"{*,src/**/*}.+(ts|js|md|html)\"",
+		"test": "ng test",
+		"test:coverage": "ng test --coverage",
+		"tslint": "tslint --format stylish --fix --project tsconfig.json \"{*,src/**/*}.ts\""
 	},
 	"husky": {
 		"hooks": {
