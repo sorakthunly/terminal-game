@@ -2,6 +2,8 @@ version: 2
 jobs:
   build:
     working_directory: ~/project
+    docker:
+      - image: circleci/node:12.4.0-browsers
     steps:
       - checkout
       - run:
@@ -27,6 +29,8 @@ jobs:
           - .firebaserc
   deploy:
     working_directory: ~/project
+    docker:
+      - image: circleci/node:12.4.0-browsers
     steps:
       - run:
         name: Show current branch
