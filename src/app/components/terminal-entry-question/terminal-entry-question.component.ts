@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { ITerminalEntry } from 'src/app/types/terminal-entry';
 
 @Component({
 	selector: 'app-terminal-entry-question',
@@ -8,5 +7,5 @@ import { ITerminalEntry } from 'src/app/types/terminal-entry';
 })
 export class TerminalEntryQuestionComponent {
 	/** A terminal entry object */
-	@Input() terminalEntry: ITerminalEntry;
+	@Input() question: string;
 }

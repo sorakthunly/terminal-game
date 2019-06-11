@@ -10,6 +10,7 @@ import { TerminalEntryQuestionComponent } from './components/terminal-entry-ques
 import { TerminalEntryComponent } from './components/terminal-entry/terminal-entry.component';
 import { TerminalWindowComponent } from './components/terminal-window/terminal-window.component';
 import { AutoFocusDirective } from './directives/auto-focus.directive';
+import { TerminalEntryQuestionPipe } from './pipes/terminal-entry-question.pipe';
 
 @NgModule({
 	declarations: [
@@ -20,7 +21,8 @@ import { AutoFocusDirective } from './directives/auto-focus.directive';
 		TerminalEntryQuestionComponent,
 		TerminalEntryLogComponent,
 		TerminalEntryErrorComponent,
-		TerminalEntryFormComponent
+		TerminalEntryFormComponent,
+		TerminalEntryQuestionPipe
 	],
 	imports: [BrowserModule, FormsModule],
 	providers: [],

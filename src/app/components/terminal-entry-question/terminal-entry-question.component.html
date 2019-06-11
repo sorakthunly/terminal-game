@@ -1,11 +1,1 @@
-<h6>
-	<ng-container [ngSwitch]="terminalEntry.state">
-		<span *ngSwitchCase="'frequency'">
-			Please input the number of time in seconds between emitting numbers and their frequency
-		</span>
-		<span *ngSwitchCase="'initial'">Please enter the first number</span>
-		<span *ngSwitchCase="'in-progress'">Please enter the next number</span>
-		<span *ngSwitchCase="'halted'">Timer halted</span>
-		<span *ngSwitchCase="'resumed'">Timer resumed</span>
-	</ng-container>
-</h6>
+<h6>{{ terminalEntryQuestion }}</h6>

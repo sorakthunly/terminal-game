@@ -22,6 +22,7 @@ The application should accept an ongoing series of user supplied numbers as inpu
 ## What to Expect
 
 - e2e with Protractor is configured by Angular CLI but no tests written
+- Resuable components are small and may not be necessary. They're there to demonstrate components breakdown
 
 ## Development server
 
