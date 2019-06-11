@@ -5,6 +5,7 @@
 		"ng": "ng",
 		"start": "ng serve",
 		"build": "ng build",
+		"build:prod": "ng build --prod",
 		"deploy:firebase": "firebase deploy",
 		"e2e": "ng e2e",
 		"lint": "npm run prettier && npm run tslint",
