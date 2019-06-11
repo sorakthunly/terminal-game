@@ -11,11 +11,11 @@ export function generateTerminalMessage(terminalEntries: Array<ITerminalEntry>):
 	const entryCounts: Array<ITerminalEntryCount> = [];
 
 	const validTerminalEntries = terminalEntries.filter(entry => {
-		const reply = entry.reply;
-		if (!reply) {
+		if (!entry.isComplete) {
 			return false;
 		}
 
+		const reply = entry.reply;
 		const isReplyNumeric = isNumeric(reply);
 		const isNotFrequencyEntry = entry.state !== 'frequency';
 		const isValidEntry = isReplyNumeric && isNotFrequencyEntry;

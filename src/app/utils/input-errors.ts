@@ -1,9 +1,11 @@
+import { FREQUENCY_INPUT_ERROR, INITIAL_INPUT_ERROR, INPUT_ERROR } from '../constants/errors';
+
 /**
  * @description
  * Throw frequency input error with a meaningful message to display.
  */
 export function throwFrequencyInputError(): never {
-	throw new Error('Frequency number should be numeric');
+	throw new Error(FREQUENCY_INPUT_ERROR);
 }
 
 /**
@@ -11,7 +13,7 @@ export function throwFrequencyInputError(): never {
  * Throw initial input error with a meaningful message to display.
  */
 export function throwInitialInputError(): never {
-	throw new Error('Initial number should be numeric');
+	throw new Error(INITIAL_INPUT_ERROR);
 }
 
 /**
@@ -19,6 +21,5 @@ export function throwInitialInputError(): never {
  * Throw invalid input error with a meaningful message to display.
  */
 export function throwInputError(): never {
-	const message = 'Input should be numeric or belongs to one of the following keywords e.g. halt, resume, quit';
-	throw new Error(message);
+	throw new Error(INPUT_ERROR);
 }

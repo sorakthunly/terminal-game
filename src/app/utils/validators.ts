@@ -8,7 +8,7 @@ import { isNumeric } from 'validator';
  */
 export function isGreaterThanZero(value: string): boolean {
 	const isReplyNumeric = isNumeric(value);
-	const isReplyZero = Number(value) > 0;
+	const isReplyGreaterThanZero = Number(value) > 0;
 
-	return isReplyNumeric && !isReplyZero;
+	return isReplyNumeric && isReplyGreaterThanZero;
 }
