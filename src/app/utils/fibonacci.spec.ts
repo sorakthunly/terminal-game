@@ -13,16 +13,26 @@ describe('Utils - Fibonacci', () => {
 	});
 
 	describe('Fibonacci - isFibonacci Function', () => {
-		it('should return true when a number belongs to the given fibonacci sequence', () => {
+		it('should return true when a given numeric string belongs to the given fibonacci sequence', () => {
 			const generatedSequence = generateFibonacciSequence(5);
-			const isValueFibonacci = isFibonacci('1', generatedSequence);
+			const value = '1';
+			const isValueFibonacci = isFibonacci(value, generatedSequence);
 
 			expect(isValueFibonacci).toBeTruthy();
 		});
 
-		it('should return false when a number does not belong to the given fibonacci sequence', () => {
+		it('should return false when a given numeric string does not belong to the given fibonacci sequence', () => {
 			const generatedSequence = generateFibonacciSequence(5);
-			const isValueFibonacci = isFibonacci('8', generatedSequence);
+			const value = '8';
+			const isValueFibonacci = isFibonacci(value, generatedSequence);
+
+			expect(isValueFibonacci).toBeFalsy();
+		});
+
+		it('should return false when a given string is not numeric', () => {
+			const generatedSequence = generateFibonacciSequence(5);
+			const value = 'A';
+			const isValueFibonacci = isFibonacci(value, generatedSequence);
 
 			expect(isValueFibonacci).toBeFalsy();
 		});

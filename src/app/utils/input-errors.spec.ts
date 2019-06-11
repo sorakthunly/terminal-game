@@ -4,34 +4,19 @@ import { throwFrequencyInputError, throwInitialInputError, throwInputError } fro
 describe('Utils - Input Errors', () => {
 	describe('Input Errors - throwFrequencyInputError Function', () => {
 		it('should throw an error with the correct error message', () => {
-			try {
-				throwFrequencyInputError();
-			} catch (err) {
-				const message = err.message;
-				expect(message).toEqual(FREQUENCY_INPUT_ERROR);
-			}
+			expect(throwFrequencyInputError).toThrowError(FREQUENCY_INPUT_ERROR);
 		});
 	});
 
 	describe('Input Errors - throwInitialInputError Function', () => {
 		it('should throw an error with the correct error message', () => {
-			try {
-				throwInitialInputError();
-			} catch (err) {
-				const message = err.message;
-				expect(message).toEqual(INITIAL_INPUT_ERROR);
-			}
+			expect(throwInitialInputError).toThrow(INITIAL_INPUT_ERROR);
 		});
 	});
 
 	describe('Input Errors - throwInputError Function', () => {
 		it('should throw an error with the correct error message', () => {
-			try {
-				throwInputError();
-			} catch (err) {
-				const message = err.message;
-				expect(message).toEqual(INPUT_ERROR);
-			}
+			expect(throwInputError).toThrow(INPUT_ERROR);
 		});
 	});
 });

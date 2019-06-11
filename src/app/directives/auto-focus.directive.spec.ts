@@ -1,10 +1,32 @@
-import { ElementRef } from '@angular/core';
+import { Component } from '@angular/core';
+import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { AutoFocusDirective } from './auto-focus.directive';
 
+@Component({
+	selector: 'app-test-component',
+	template: '<input appAutoFocus type="text" />'
+})
+class TestComponent {}
+
 describe('AutoFocusDirective', () => {
-	it('should create an instance', () => {
-		const mockElementRef = new ElementRef(null);
-		const directive = new AutoFocusDirective(mockElementRef);
-		expect(directive).toBeTruthy();
+	let component: TestComponent;
+	let fixture: ComponentFixture<TestComponent>;
+
+	beforeEach(() => {
+		TestBed.configureTestingModule({
+			declarations: [TestComponent, AutoFocusDirective]
+		});
+	});
+
+	beforeEach(() => {
+		fixture = TestBed.createComponent(TestComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
+
+	it('should focus the input after the view is initialised', () => {
+		const compiled: HTMLElement = fixture.debugElement.nativeElement;
+		const focusInput = compiled.querySelector('input:focus');
+		expect(focusInput).toBeTruthy();
 	});
 });

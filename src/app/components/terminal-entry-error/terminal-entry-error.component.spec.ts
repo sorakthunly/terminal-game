@@ -1,5 +1,4 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { TerminalEntryErrorComponent } from './terminal-entry-error.component';
 
 describe('TerminalEntryErrorComponent', () => {
@@ -18,7 +17,20 @@ describe('TerminalEntryErrorComponent', () => {
 		fixture.detectChanges();
 	});
 
-	it('should create', () => {
-		expect(component).toBeTruthy();
+	it('should not show any paragraph element when input is not provided', () => {
+		fixture.detectChanges();
+
+		const compiled: HTMLElement = fixture.debugElement.nativeElement;
+		const paragraph = compiled.querySelector('p');
+		expect(paragraph).toBeNull();
+	});
+
+	it('should correctly update the UI with the input message provided', () => {
+		component.message = 'You have an error message';
+		fixture.detectChanges();
+
+		const compiled: HTMLElement = fixture.debugElement.nativeElement;
+		const paragraph = compiled.querySelector('p');
+		expect(paragraph.textContent).toEqual(component.message);
 	});
 });
