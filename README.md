@@ -1,5 +1,6 @@
 ![image](https://user-images.githubusercontent.com/19909685/59242321-6fa60600-8c4e-11e9-8d82-6b2fea6fd668.png)
-Live Application: https://terminal-game.firebaseapp.com
+Live Application with Firebase: https://terminal-game.firebaseapp.com
+Live Application with S3: http://terminal-game.s3-website-ap-southeast-2.amazonaws.com
 
 # Terminal Game
 
@@ -17,12 +18,12 @@ The application should accept an ongoing series of user supplied numbers as inpu
 - Unit testing with Jest instead of Karma and Jasmine (performance reason)
 - Continuous integration and deployment with S3, Docker and Travis CI
 - Continuous integration and deployment with Firebase and Circle CI
-- Enhanced linting tools using Prettier with Tslint
+- Enhanced linting tools with Prettier and Tslint
 - Commit hook for linting with Husky and Lint-staged
 
 ## What to Expect
 
-- You can't using `quit` command on frequency and initial input by design choice
+- You can't use `quit` command on frequency and initial number input by design choice
 - Resuable components are small and may not be necessary. They're there to demonstrate components breakdown
 - All tests passed but one test case throws `Not implemented: window.alert` which is a known [jsdom issue](https://github.com/rstacruz/jsdom-global/issues/25)
 

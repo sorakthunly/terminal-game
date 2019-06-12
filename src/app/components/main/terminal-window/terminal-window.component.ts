@@ -7,13 +7,10 @@ import {
 	fromSecondsToMilliseconds,
 	generateFibonacciSequence,
 	isFibonacci,
-	throwFrequencyInputError,
-	throwInitialInputError,
-	throwInputError,
-	isInvalidFrequencyEntry,
-	isInvalidInitialEntry,
-	isInvalidNonFrequencyEntry,
-	generateTerminalMessage
+	generateTerminalMessage,
+	checkFrequencyEntry,
+	checkInitialEntry,
+	checkNonFrequencyEntry
 } from 'src/app/utils';
 
 @Component({
@@ -112,20 +109,9 @@ export class TerminalWindowComponent {
 				return;
 			}
 
-			const isFrequencyEntryInvalid = isInvalidFrequencyEntry(terminalEntry);
-			if (isFrequencyEntryInvalid) {
-				return throwFrequencyInputError();
-			}
-
-			const isInitialEntryInvalid = isInvalidInitialEntry(terminalEntry);
-			if (isInitialEntryInvalid) {
-				return throwInitialInputError();
-			}
-
-			const isNonFrequencyEntryInvalid = isInvalidNonFrequencyEntry(terminalEntry);
-			if (isNonFrequencyEntryInvalid) {
-				return throwInputError();
-			}
+			checkFrequencyEntry(terminalEntry);
+			checkInitialEntry(terminalEntry);
+			checkNonFrequencyEntry(terminalEntry);
 
 			this.handleTerminalEntrySubmit(terminalEntry);
 		} catch (error) {
