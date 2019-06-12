@@ -1,5 +1,5 @@
 import { isNumeric } from 'validator';
-import { ITerminalEntry } from '../types';
+import { ITerminalEntry, ETerminalEntryState } from '../types';
 import { isTerminalEntryKeyword } from './terminal-entry';
 import { isGreaterThanZero } from './validators';
 
@@ -10,7 +10,7 @@ import { isGreaterThanZero } from './validators';
  * @param {ITerminalEntry} terminalEntry	Terminal entry object
  */
 export function isInvalidFrequencyEntry(terminalEntry: ITerminalEntry) {
-	const isStateFrequency = terminalEntry.state === 'frequency';
+	const isStateFrequency = terminalEntry.state === ETerminalEntryState.FREQUENCY;
 	const isInputValid = isGreaterThanZero(terminalEntry.input);
 
 	return isStateFrequency && !isInputValid;
@@ -23,7 +23,7 @@ export function isInvalidFrequencyEntry(terminalEntry: ITerminalEntry) {
  * @param {ITerminalEntry} terminalEntry	Terminal entry object
  */
 export function isInvalidNonFrequencyEntry(terminalEntry: ITerminalEntry) {
-	const isStateNotFrequency = terminalEntry.state !== 'frequency';
+	const isStateNotFrequency = terminalEntry.state !== ETerminalEntryState.FREQUENCY;
 	const isInputNumeric = isNumeric(terminalEntry.input);
 	const isInputKeyword = isTerminalEntryKeyword(terminalEntry.input);
 	const isInputValid = isInputNumeric || isInputKeyword;
@@ -38,7 +38,7 @@ export function isInvalidNonFrequencyEntry(terminalEntry: ITerminalEntry) {
  * @param {ITerminalEntry} terminalEntry	Terminal entry object
  */
 export function isInvalidInitialEntry(terminalEntry: ITerminalEntry) {
-	const isStateInitial = terminalEntry.state === 'initial';
+	const isStateInitial = terminalEntry.state === ETerminalEntryState.INITIAL;
 	const isInputNumeric = isNumeric(terminalEntry.input);
 
 	return isStateInitial && !isInputNumeric;

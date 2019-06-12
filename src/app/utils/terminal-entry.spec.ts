@@ -1,5 +1,5 @@
 import { FREQUENCY_QUESTION, HALTED_QUESTION } from '../constants';
-import { TTerminalEntryState } from '../types';
+import { ETerminalEntryState } from '../types';
 import { isTerminalEntryKeyword, getTerminalEntryQuestion } from './terminal-entry';
 
 describe('Utils - Terminal Entry', () => {
@@ -27,18 +27,18 @@ describe('Utils - Terminal Entry', () => {
 
 	describe('Terminal Entry - getTerminalEntryQuestion Function', () => {
 		it('should return valid question if the valid state is provided', () => {
-			const frequencyState: TTerminalEntryState = 'frequency';
+			const frequencyState = ETerminalEntryState.FREQUENCY;
 			const frequencyQuestion = getTerminalEntryQuestion(frequencyState);
 			expect(frequencyQuestion).toEqual(FREQUENCY_QUESTION);
 
-			const haltedState: TTerminalEntryState = 'halted';
+			const haltedState = ETerminalEntryState.HALTED;
 			const haltedQuestion = getTerminalEntryQuestion(haltedState);
 			expect(haltedQuestion).toEqual(HALTED_QUESTION);
 		});
 
 		it('should return undefined if invalid state is provided', () => {
 			const invalidState = 'invalid';
-			const question = getTerminalEntryQuestion(<TTerminalEntryState>invalidState);
+			const question = getTerminalEntryQuestion(<ETerminalEntryState>invalidState);
 			expect(question).toBeUndefined();
 		});
 	});

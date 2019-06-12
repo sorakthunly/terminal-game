@@ -1,9 +1,8 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { first, last, cloneDeep, isEqual } from 'lodash';
-import { FAREWELL } from 'src/app/constants';
-import { FREQUENCY_INPUT_ERROR } from 'src/app/constants/errors';
-import { ITerminalEntry, TTerminalEntryState } from 'src/app/types/terminal-entry';
+import { FAREWELL, FREQUENCY_INPUT_ERROR, QUIT_KEYWORD, RESUME_KEYWORD } from 'src/app/constants';
+import { ITerminalEntry, ETerminalEntryState } from 'src/app/types';
 import { TerminalWindowComponent } from './terminal-window.component';
 
 describe('TerminalWindowComponent', () => {
@@ -11,10 +10,10 @@ describe('TerminalWindowComponent', () => {
 	let fixture: ComponentFixture<TerminalWindowComponent>;
 
 	const terminalEntries: Array<ITerminalEntry> = [
-		{ state: 'frequency', isComplete: true, input: '1' },
-		{ state: 'initial', isComplete: true, input: '2' },
-		{ state: 'in-progress', isComplete: true, input: '2' },
-		{ state: 'in-progress', isComplete: false }
+		{ state: ETerminalEntryState.FREQUENCY, isComplete: true, input: '1' },
+		{ state: ETerminalEntryState.INITIAL, isComplete: true, input: '2' },
+		{ state: ETerminalEntryState.IN_PROGRESS, isComplete: true, input: '2' },
+		{ state: ETerminalEntryState.IN_PROGRESS, isComplete: false }
 	];
 
 	beforeEach(async(() => {
@@ -38,7 +37,7 @@ describe('TerminalWindowComponent', () => {
 
 		it('should initialise terminal input entries', () => {
 			const frequencyEntry = component.terminalEntries[0];
-			expect(frequencyEntry.state).toBe('frequency');
+			expect(frequencyEntry.state).toBe(ETerminalEntryState.FREQUENCY);
 			expect(frequencyEntry.isComplete).toBeFalsy();
 		});
 	});
@@ -66,19 +65,19 @@ describe('TerminalWindowComponent', () => {
 
 	describe('TerminalWindowComponent - markNonFrequencyEntryAsFibonacci Method', () => {
 		it('should mark non frequency entry as fibonacci if it is', () => {
-			const terminalEntry: ITerminalEntry = { state: 'in-progress', isComplete: true, input: '1' };
+			const terminalEntry: ITerminalEntry = { state: ETerminalEntryState.IN_PROGRESS, isComplete: true, input: '1' };
 			component.markNonFrequencyEntryAsFibonacci(terminalEntry);
 			expect(terminalEntry.isInputFibonacci).toBeTruthy();
 		});
 
 		it('should mark non frequency entry as not fibonacci if it is not', () => {
-			const terminalEntry: ITerminalEntry = { state: 'in-progress', isComplete: true, input: '4' };
+			const terminalEntry: ITerminalEntry = { state: ETerminalEntryState.IN_PROGRESS, isComplete: true, input: '4' };
 			component.markNonFrequencyEntryAsFibonacci(terminalEntry);
 			expect(terminalEntry.isInputFibonacci).toBeFalsy();
 		});
 
 		it('should not change fibonacci flag on frequency entry', () => {
-			const terminalEntry: ITerminalEntry = { state: 'frequency', isComplete: true, input: '1' };
+			const terminalEntry: ITerminalEntry = { state: ETerminalEntryState.FREQUENCY, isComplete: true, input: '1' };
 			component.markNonFrequencyEntryAsFibonacci(terminalEntry);
 			expect(terminalEntry.isInputFibonacci).toBeUndefined();
 		});
@@ -94,7 +93,11 @@ describe('TerminalWindowComponent', () => {
 		it('should alert a farewell message and reset component state if the entry input is quit', () => {
 			spyOn(window, 'alert');
 
-			const terminalEntry: ITerminalEntry = { state: 'in-progress', isComplete: false, input: 'quit' };
+			const terminalEntry: ITerminalEntry = {
+				state: ETerminalEntryState.IN_PROGRESS,
+				isComplete: false,
+				input: QUIT_KEYWORD
+			};
 			component.handleTerminalEntrySubmit(terminalEntry);
 
 			expect(window.alert).toHaveBeenCalledWith(FAREWELL);
@@ -104,12 +107,12 @@ describe('TerminalWindowComponent', () => {
 			component.terminalEntries = cloneDeep(terminalEntries);
 
 			const lastTerminalEntry = last(component.terminalEntries);
-			lastTerminalEntry.input = 'quit';
+			lastTerminalEntry.input = QUIT_KEYWORD;
 
 			component.handleTerminalEntrySubmit(lastTerminalEntry);
 			expect(component.frequencyInMilliseconds).toBeUndefined();
 
-			const expectedEntry: ITerminalEntry = { state: 'frequency', isComplete: false };
+			const expectedEntry: ITerminalEntry = { state: ETerminalEntryState.FREQUENCY, isComplete: false };
 			const isShallowEqual = isEqual(component.terminalEntries[0], expectedEntry);
 			expect(isShallowEqual).toBeTruthy();
 		});
@@ -117,62 +120,66 @@ describe('TerminalWindowComponent', () => {
 
 	describe('TerminalWindowComponent - handleTerminalEntryUpdate Method', () => {
 		it('should append initial entry when current entry is frequency and set frequencyInMilliseconds', () => {
-			const terminalEntry: ITerminalEntry = { state: 'frequency', isComplete: true, input: '1' };
+			const terminalEntry: ITerminalEntry = { state: ETerminalEntryState.FREQUENCY, isComplete: true, input: '1' };
 			component.handleTerminalEntryUpdate(terminalEntry);
 
 			const lastTerminalEntry = last(component.terminalEntries);
-			expect(lastTerminalEntry.state).toEqual('initial');
+			expect(lastTerminalEntry.state).toEqual(ETerminalEntryState.INITIAL);
 			expect(component.frequencyInMilliseconds).toEqual(1000);
 		});
 
 		it('should append in-progress entry when current entry is initial and start the timer', () => {
-			const terminalEntry: ITerminalEntry = { state: 'initial', isComplete: true, input: '1' };
+			const terminalEntry: ITerminalEntry = { state: ETerminalEntryState.INITIAL, isComplete: true, input: '1' };
 			component.handleTerminalEntryUpdate(terminalEntry);
 
 			const lastTerminalEntry = last(component.terminalEntries);
-			expect(lastTerminalEntry.state).toEqual('in-progress');
+			expect(lastTerminalEntry.state).toEqual(ETerminalEntryState.IN_PROGRESS);
 		});
 	});
 
 	describe('TerminalWindowComponent - handleTerminalInProgressEntry Method', () => {
 		it('should generate another in-progress entry if the entry input is not halt', () => {
-			const currentEntry: ITerminalEntry = { state: 'in-progress', isComplete: true, input: '1' };
+			const currentEntry: ITerminalEntry = { state: ETerminalEntryState.IN_PROGRESS, isComplete: true, input: '1' };
 			component.handleTerminalInProgressEntry(currentEntry);
 
 			const lastTerminalEntry = last(component.terminalEntries);
-			expect(lastTerminalEntry.state).toEqual('in-progress');
+			expect(lastTerminalEntry.state).toEqual(ETerminalEntryState.IN_PROGRESS);
 		});
 
 		it('should generate halted entry if the entry input is halt', () => {
-			const currentEntry: ITerminalEntry = { state: 'in-progress', isComplete: true, input: 'halt' };
+			const currentEntry: ITerminalEntry = { state: ETerminalEntryState.IN_PROGRESS, isComplete: true, input: 'halt' };
 			component.handleTerminalInProgressEntry(currentEntry);
 
 			const lastTerminalEntry = last(component.terminalEntries);
-			expect(lastTerminalEntry.state).toEqual('halted');
+			expect(lastTerminalEntry.state).toEqual(ETerminalEntryState.HALTED);
 		});
 	});
 
 	describe('TerminalWindowComponent - handleTerminalHaltedEntry Method', () => {
 		it('should generate another halted entry if the entry input is not resume', () => {
-			const currentEntry: ITerminalEntry = { state: 'halted', isComplete: true, input: '1' };
+			const currentEntry: ITerminalEntry = { state: ETerminalEntryState.HALTED, isComplete: true, input: '1' };
 			component.handleTerminalHaltedEntry(currentEntry);
 
 			const lastTerminalEntry = last(component.terminalEntries);
-			expect(lastTerminalEntry.state).toEqual('halted');
+			expect(lastTerminalEntry.state).toEqual(ETerminalEntryState.HALTED);
 		});
 
 		it('should generate resumed entry if the entry input is resume', () => {
-			const currentEntry: ITerminalEntry = { state: 'halted', isComplete: true, input: 'resume' };
+			const currentEntry: ITerminalEntry = {
+				state: ETerminalEntryState.HALTED,
+				isComplete: true,
+				input: RESUME_KEYWORD
+			};
 			component.handleTerminalHaltedEntry(currentEntry);
 
 			const lastTerminalEntry = last(component.terminalEntries);
-			expect(lastTerminalEntry.state).toEqual('resumed');
+			expect(lastTerminalEntry.state).toEqual(ETerminalEntryState.RESUMED);
 		});
 	});
 
 	describe('App Component - addNewTerminalEntry Method', () => {
 		it('should add a new entry to the terminal entries array with a given state', () => {
-			const newState: TTerminalEntryState = 'halted';
+			const newState: ETerminalEntryState = ETerminalEntryState.HALTED;
 			component.addNewTerminalEntry(newState);
 
 			const lastTerminalEntry = last(component.terminalEntries);

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { TTerminalEntryState } from '../types';
+import { ETerminalEntryState } from '../types';
 import { getTerminalEntryQuestion } from '../utils';
 
 @Pipe({
@@ -10,9 +10,9 @@ export class TerminalEntryQuestionPipe implements PipeTransform {
 	 * @description
 	 * Transform a state into terminal entry question.
 	 *
-	 * @param {TTerminalEntryState} state State of the terminal entry object
+	 * @param {ETerminalEntryState} state State of the terminal entry object
 	 */
-	transform(state: TTerminalEntryState): string {
+	transform(state: ETerminalEntryState): string {
 		return getTerminalEntryQuestion(state);
 	}
 }

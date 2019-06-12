@@ -14,13 +14,15 @@ The application should accept an ongoing series of user supplied numbers as inpu
 
 ## What's Included
 
-- Unit testing configured with Jest instead of Karma and Jasmine (performance reason)
+- Unit testing with Jest instead of Karma and Jasmine (performance reason)
+- Continuous integration and deployment with S3, Docker and Travis CI
 - Continuous integration and deployment with Firebase and Circle CI
-- Enhanced linting tools using Prettier and Tslint
+- Enhanced linting tools using Prettier with Tslint
 - Commit hook for linting with Husky and Lint-staged
 
 ## What to Expect
 
+- You can't using `quit` command on frequency and initial input by design choice
 - Resuable components are small and may not be necessary. They're there to demonstrate components breakdown
 - All tests passed but one test case throws `Not implemented: window.alert` which is a known [jsdom issue](https://github.com/rstacruz/jsdom-global/issues/25)
 

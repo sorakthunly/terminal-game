@@ -10,7 +10,7 @@ export class TimerService {
 	private timeInMilliseconds: number;
 
 	/** Application timer setInterval */
-	private timerInterval;
+	private timerIntervalId;
 
 	/** Time counter observable in milliseconds */
 	timeInMilliseconds$: BehaviorSubject<number>;
@@ -37,7 +37,7 @@ export class TimerService {
 	 * Whether the state is paused.
 	 */
 	get isHalted(): boolean {
-		return isUndefined(this.timerInterval);
+		return isUndefined(this.timerIntervalId);
 	}
 
 	/**
@@ -47,7 +47,7 @@ export class TimerService {
 	 * @param {number} interval Interval to count in milliseconds, defaulted to ten
 	 */
 	startTimer(interval: number = 10) {
-		this.timerInterval = setInterval(() => {
+		this.timerIntervalId = setInterval(() => {
 			this.timeInMilliseconds += interval;
 			this.timeInMilliseconds$.next(this.timeInMilliseconds);
 		}, interval);
@@ -58,7 +58,7 @@ export class TimerService {
 	 * Stop the timer counter.
 	 */
 	stopTimer() {
-		clearInterval(this.timerInterval);
-		this.timerInterval = undefined;
+		clearInterval(this.timerIntervalId);
+		this.timerIntervalId = undefined;
 	}
 }

@@ -1,7 +1,14 @@
-export type TTerminalEntryState = 'frequency' | 'initial' | 'in-progress' | 'halted' | 'resumed' | 'quit';
+export enum ETerminalEntryState {
+	FREQUENCY = 'frequency',
+	INITIAL = 'initial',
+	IN_PROGRESS = 'in-progress',
+	HALTED = 'halted',
+	RESUMED = 'resumed',
+	QUIT = 'quit'
+}
 
 export interface ITerminalEntry {
-	state: TTerminalEntryState;
+	state: ETerminalEntryState;
 	isComplete: boolean;
 	messages?: Array<string>;
 	input?: string;

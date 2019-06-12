@@ -1,5 +1,5 @@
 import { isNumeric } from 'validator';
-import { ITerminalEntryCount, ITerminalEntry } from '../types';
+import { ITerminalEntryCount, ITerminalEntry, ETerminalEntryState } from '../types';
 
 /**
  * @description
@@ -17,7 +17,7 @@ export function generateTerminalMessage(terminalEntries: Array<ITerminalEntry>):
 
 		const input = entry.input;
 		const isInputNumeric = isNumeric(input);
-		const isNotFrequencyEntry = entry.state !== 'frequency';
+		const isNotFrequencyEntry = entry.state !== ETerminalEntryState.FREQUENCY;
 		const isValidEntry = isInputNumeric && isNotFrequencyEntry;
 
 		return isValidEntry ? entry : false;

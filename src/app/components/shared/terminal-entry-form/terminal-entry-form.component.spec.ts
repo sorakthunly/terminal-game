@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { FIBONACCI_ALERT } from 'src/app/constants';
-import { ITerminalEntry } from 'src/app/types/terminal-entry';
+import { ITerminalEntry, ETerminalEntryState } from 'src/app/types';
 import { TerminalEntryFormComponent } from './terminal-entry-form.component';
 
 describe('TerminalEntryFormComponent', () => {
@@ -21,7 +21,7 @@ describe('TerminalEntryFormComponent', () => {
 	});
 
 	it('should render the basic component elements with valid entry input provided', () => {
-		component.terminalEntry = { state: 'frequency', isComplete: false };
+		component.terminalEntry = { state: ETerminalEntryState.FREQUENCY, isComplete: false };
 		fixture.detectChanges();
 
 		const compiled: HTMLElement = fixture.debugElement.nativeElement;
@@ -33,7 +33,12 @@ describe('TerminalEntryFormComponent', () => {
 	});
 
 	it(`should render the component with ${FIBONACCI_ALERT} flag displayed when the entry input is a fibonacci number`, () => {
-		component.terminalEntry = { state: 'initial', isComplete: true, input: '1', isInputFibonacci: true };
+		component.terminalEntry = {
+			state: ETerminalEntryState.INITIAL,
+			isComplete: true,
+			input: '1',
+			isInputFibonacci: true
+		};
 		fixture.detectChanges();
 
 		const compiled: HTMLElement = fixture.debugElement.nativeElement;
@@ -47,7 +52,7 @@ describe('TerminalEntryFormComponent', () => {
 		let submitEvent: ITerminalEntry;
 		component.submit.subscribe(event => (submitEvent = event));
 
-		component.terminalEntry = { state: 'frequency', isComplete: false };
+		component.terminalEntry = { state: ETerminalEntryState.FREQUENCY, isComplete: false };
 		fixture.detectChanges();
 
 		component.submitTerminalInput();
@@ -56,7 +61,7 @@ describe('TerminalEntryFormComponent', () => {
 	});
 
 	it('should focus the input element when a document click event is dispatched', () => {
-		component.terminalEntry = { state: 'frequency', isComplete: false };
+		component.terminalEntry = { state: ETerminalEntryState.FREQUENCY, isComplete: false };
 		fixture.detectChanges();
 
 		document.dispatchEvent(new MouseEvent('click'));

@@ -3,8 +3,7 @@ import { ITerminalEntry } from 'src/app/types';
 
 @Component({
 	selector: 'app-terminal-entry',
-	templateUrl: './terminal-entry.component.html',
-	styleUrls: ['./terminal-entry.component.scss']
+	templateUrl: './terminal-entry.component.html'
 })
 export class TerminalEntryComponent {
 	/** A terminal entry object */

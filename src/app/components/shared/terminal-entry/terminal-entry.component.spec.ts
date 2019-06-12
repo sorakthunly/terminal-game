@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TerminalEntryQuestionPipe } from 'src/app/pipes/terminal-entry-question.pipe';
-import { ITerminalEntry } from 'src/app/types/terminal-entry';
+import { ITerminalEntry, ETerminalEntryState } from 'src/app/types/terminal-entry';
 import { TerminalEntryComponent } from './terminal-entry.component';
 
 describe('TerminalEntryComponent', () => {
@@ -28,7 +28,7 @@ describe('TerminalEntryComponent', () => {
 	});
 
 	it('should render app-terminal-entry-question and app-terminal-entry-form when a valid entry input is provided', () => {
-		component.terminalEntry = { state: 'frequency', isComplete: false };
+		component.terminalEntry = { state: ETerminalEntryState.FREQUENCY, isComplete: false };
 		fixture.detectChanges();
 
 		const compiled: HTMLElement = fixture.debugElement.nativeElement;
@@ -40,7 +40,7 @@ describe('TerminalEntryComponent', () => {
 	});
 
 	it('should render app-terminal-entry-log when an array of log messages are provided', () => {
-		component.terminalEntry = { state: 'frequency', isComplete: false, messages: ['Some message'] };
+		component.terminalEntry = { state: ETerminalEntryState.FREQUENCY, isComplete: false, messages: ['Some message'] };
 		fixture.detectChanges();
 
 		const compiled: HTMLElement = fixture.debugElement.nativeElement;
@@ -50,7 +50,7 @@ describe('TerminalEntryComponent', () => {
 
 	it('should render app-terminal-entry-error when an error message is provided', () => {
 		component.terminalEntry = {
-			state: 'frequency',
+			state: ETerminalEntryState.FREQUENCY,
 			isComplete: true,
 			input: 'invalid',
 			inputErrorMessage: 'Error message'
@@ -66,7 +66,7 @@ describe('TerminalEntryComponent', () => {
 		let submitEvent: ITerminalEntry;
 		component.submit.subscribe(event => (submitEvent = event));
 
-		const terminalEntry: ITerminalEntry = { state: 'frequency', isComplete: false };
+		const terminalEntry: ITerminalEntry = { state: ETerminalEntryState.FREQUENCY, isComplete: false };
 		component.submit.emit(terminalEntry);
 
 		fixture.detectChanges();

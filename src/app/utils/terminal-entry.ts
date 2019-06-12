@@ -3,9 +3,12 @@ import {
 	INITIAL_QUESTION,
 	IN_PROGRESS_QUESTION,
 	HALTED_QUESTION,
-	RESUMED_QUESTION
+	RESUMED_QUESTION,
+	HALT_KEYWORD,
+	RESUME_KEYWORD,
+	QUIT_KEYWORD
 } from '../constants';
-import { TTerminalEntryState } from '../types';
+import { ETerminalEntryState } from '../types';
 
 /**
  * @description
@@ -14,7 +17,7 @@ import { TTerminalEntryState } from '../types';
  * @param {string} input	Input string
  */
 export function isTerminalEntryKeyword(input: string): boolean {
-	const keywords: Array<string> = ['halt', 'resume', 'quit'];
+	const keywords: Array<string> = [HALT_KEYWORD, RESUME_KEYWORD, QUIT_KEYWORD];
 	const isInputKeyword = keywords.indexOf(input) > -1;
 
 	return isInputKeyword;
@@ -26,21 +29,21 @@ export function isTerminalEntryKeyword(input: string): boolean {
  *
  * @param {TTerminalEntryStatee} entryState	State of the terminal entry
  */
-export function getTerminalEntryQuestion(entryState: TTerminalEntryState): string {
+export function getTerminalEntryQuestion(entryState: ETerminalEntryState): string {
 	switch (entryState) {
-		case 'frequency':
+		case ETerminalEntryState.FREQUENCY:
 			return FREQUENCY_QUESTION;
 
-		case 'initial':
+		case ETerminalEntryState.INITIAL:
 			return INITIAL_QUESTION;
 
-		case 'in-progress':
+		case ETerminalEntryState.IN_PROGRESS:
 			return IN_PROGRESS_QUESTION;
 
-		case 'halted':
+		case ETerminalEntryState.HALTED:
 			return HALTED_QUESTION;
 
-		case 'resumed':
+		case ETerminalEntryState.RESUMED:
 			return RESUMED_QUESTION;
 
 		default:

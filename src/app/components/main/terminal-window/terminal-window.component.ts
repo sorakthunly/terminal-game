@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { clone, last } from 'lodash';
-import { FAREWELL } from 'src/app/constants';
+import { FAREWELL, QUIT_KEYWORD, HALT_KEYWORD, RESUME_KEYWORD } from 'src/app/constants';
 import { TimerService } from 'src/app/services/timer.service';
-import { ITerminalEntry, TTerminalEntryState } from 'src/app/types';
+import { ITerminalEntry, ETerminalEntryState } from 'src/app/types';
 import {
 	fromSecondsToMilliseconds,
 	generateFibonacciSequence,
@@ -54,7 +54,7 @@ export class TerminalWindowComponent {
 	 * Initialise terminal entry.
 	 */
 	initialiseTerminalInputEntries() {
-		this.terminalEntries = [{ state: 'frequency', isComplete: false }];
+		this.terminalEntries = [{ state: ETerminalEntryState.FREQUENCY, isComplete: false }];
 	}
 
 	/**
@@ -144,7 +144,7 @@ export class TerminalWindowComponent {
 		terminalEntry.isComplete = true;
 		this.markNonFrequencyEntryAsFibonacci(terminalEntry);
 
-		const isInputQuit = terminalEntry.input === 'quit';
+		const isInputQuit = terminalEntry.input === QUIT_KEYWORD;
 		if (isInputQuit) {
 			alert(FAREWELL);
 			this.resetState();
@@ -161,7 +161,7 @@ export class TerminalWindowComponent {
 	 * @param {ITerminalEntry} terminalEntry Terminal entry object
 	 */
 	markNonFrequencyEntryAsFibonacci(terminalEntry: ITerminalEntry) {
-		const isStateNotFrequency = terminalEntry.state !== 'frequency';
+		const isStateNotFrequency = terminalEntry.state !== ETerminalEntryState.FREQUENCY;
 		if (isStateNotFrequency) {
 			terminalEntry.isInputFibonacci = isFibonacci(terminalEntry.input, this.fibonacciSequence);
 		}
@@ -176,22 +176,22 @@ export class TerminalWindowComponent {
 	 */
 	handleTerminalEntryUpdate(terminalEntry: ITerminalEntry) {
 		switch (terminalEntry.state) {
-			case 'frequency':
-				this.addNewTerminalEntry('initial');
+			case ETerminalEntryState.FREQUENCY:
+				this.addNewTerminalEntry(ETerminalEntryState.INITIAL);
 				this.frequencyInMilliseconds = fromSecondsToMilliseconds(terminalEntry.input);
 				break;
 
-			case 'initial':
-				this.addNewTerminalEntry('in-progress');
+			case ETerminalEntryState.INITIAL:
+				this.addNewTerminalEntry(ETerminalEntryState.IN_PROGRESS);
 				this.timerService.startTimer();
 				break;
 
-			case 'in-progress':
-			case 'resumed':
+			case ETerminalEntryState.IN_PROGRESS:
+			case ETerminalEntryState.RESUMED:
 				this.handleTerminalInProgressEntry(terminalEntry);
 				break;
 
-			case 'halted':
+			case ETerminalEntryState.HALTED:
 				this.handleTerminalHaltedEntry(terminalEntry);
 				break;
 		}
@@ -205,13 +205,13 @@ export class TerminalWindowComponent {
 	 */
 	handleTerminalInProgressEntry(terminalEntry: ITerminalEntry) {
 		switch (terminalEntry.input) {
-			case 'halt':
-				this.addNewTerminalEntry('halted');
+			case HALT_KEYWORD:
+				this.addNewTerminalEntry(ETerminalEntryState.HALTED);
 				this.timerService.stopTimer();
 				break;
 
 			default:
-				this.addNewTerminalEntry('in-progress');
+				this.addNewTerminalEntry(ETerminalEntryState.IN_PROGRESS);
 				break;
 		}
 	}
@@ -224,15 +224,15 @@ export class TerminalWindowComponent {
 	 */
 	handleTerminalHaltedEntry(terminalEntry: ITerminalEntry) {
 		switch (terminalEntry.input) {
-			case 'resume':
-				this.addNewTerminalEntry('resumed');
+			case RESUME_KEYWORD:
+				this.addNewTerminalEntry(ETerminalEntryState.RESUMED);
 				if (this.timerService.isHalted) {
 					this.timerService.startTimer();
 				}
 				break;
 
 			default:
-				this.addNewTerminalEntry('halted');
+				this.addNewTerminalEntry(ETerminalEntryState.HALTED);
 				break;
 		}
 	}
@@ -243,7 +243,7 @@ export class TerminalWindowComponent {
 	 *
 	 * @param {TTerminalEntryState} entry Terminal entry object
 	 */
-	addNewTerminalEntry(terminalEntryState: TTerminalEntryState) {
+	addNewTerminalEntry(terminalEntryState: ETerminalEntryState) {
 		this.terminalEntries.push({ state: terminalEntryState, isComplete: false });
 	}
 
