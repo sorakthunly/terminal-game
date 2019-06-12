@@ -11,11 +11,9 @@ describe('TimerService', () => {
 
 	it('should correctly start and stop the timer and update the isPause state', () => {
 		service.startTimer();
-		expect(service.timerInterval).toBeDefined();
-		expect(service.isPaused).toBeFalsy();
+		expect(service.isHalted).toBeFalsy();
 
 		service.stopTimer();
-		expect(service.timerInterval).toBeUndefined();
-		expect(service.isPaused).toBeTruthy();
+		expect(service.isHalted).toBeTruthy();
 	});
 });

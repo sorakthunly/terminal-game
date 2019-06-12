@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { TTerminalEntryState } from '../types/terminal-entry';
-import { getTerminalEntryQuestion } from '../utils/terminal-entry';
+import { TTerminalEntryState } from '../types';
+import { getTerminalEntryQuestion } from '../utils';
 
 @Pipe({
 	name: 'terminalEntryQuestion'

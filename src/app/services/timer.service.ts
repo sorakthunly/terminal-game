@@ -1,22 +1,43 @@
 import { Injectable } from '@angular/core';
+import { isUndefined } from 'lodash';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class TimerService {
-	/** Time behaviour subject to update the time value */
-	time$: BehaviorSubject<number> = new BehaviorSubject(0);
+	/** Time counter in milliseconds */
+	private timeInMilliseconds: number;
 
 	/** Application timer setInterval */
-	timerInterval;
+	private timerInterval;
+
+	/** Time counter observable in milliseconds */
+	timeInMilliseconds$: BehaviorSubject<number>;
+
+	/**
+	 * @description
+	 * Instantiate the service.
+	 */
+	constructor() {
+		this.initialiseTimer();
+	}
+
+	/**
+	 * @description
+	 * Initialise the time counter and the observable time counter.
+	 */
+	initialiseTimer() {
+		this.timeInMilliseconds = 0;
+		this.timeInMilliseconds$ = new BehaviorSubject(this.timeInMilliseconds);
+	}
 
 	/**
 	 * @description
 	 * Whether the state is paused.
 	 */
-	get isPaused(): boolean {
-		return !this.timerInterval;
+	get isHalted(): boolean {
+		return isUndefined(this.timerInterval);
 	}
 
 	/**
@@ -27,7 +48,8 @@ export class TimerService {
 	 */
 	startTimer(interval: number = 10) {
 		this.timerInterval = setInterval(() => {
-			this.time$.next(interval);
+			this.timeInMilliseconds += interval;
+			this.timeInMilliseconds$.next(this.timeInMilliseconds);
 		}, interval);
 	}
 

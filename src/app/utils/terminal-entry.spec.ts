@@ -1,5 +1,5 @@
-import { FREQUENCY_QUESTION, HALTED_QUESTION } from '../constants/terminal-entry-questions';
-import { TTerminalEntryState } from '../types/terminal-entry';
+import { FREQUENCY_QUESTION, HALTED_QUESTION } from '../constants';
+import { TTerminalEntryState } from '../types';
 import { isTerminalEntryKeyword, getTerminalEntryQuestion } from './terminal-entry';
 
 describe('Utils - Terminal Entry', () => {

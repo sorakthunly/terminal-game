@@ -2,5 +2,5 @@
 	<app-terminal-entry-question [question]="terminalEntry.state | terminalEntryQuestion"></app-terminal-entry-question>
 	<app-terminal-entry-log [messages]="terminalEntry.messages"></app-terminal-entry-log>
 	<app-terminal-entry-form [terminalEntry]="terminalEntry" (submit)="submit.emit($event)"></app-terminal-entry-form>
-	<app-terminal-entry-error [message]="terminalEntry.replyErrorMessage"></app-terminal-entry-error>
+	<app-terminal-entry-error [message]="terminalEntry.inputErrorMessage"></app-terminal-entry-error>
 </div>

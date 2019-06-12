@@ -52,8 +52,8 @@ describe('TerminalEntryComponent', () => {
 		component.terminalEntry = {
 			state: 'frequency',
 			isComplete: true,
-			reply: 'invalid',
-			replyErrorMessage: 'Error message'
+			input: 'invalid',
+			inputErrorMessage: 'Error message'
 		};
 		fixture.detectChanges();
 

@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { FIBONACCI_ALERT } from 'src/app/constants';
 import { ITerminalEntry } from 'src/app/types/terminal-entry';
 import { TerminalEntryFormComponent } from './terminal-entry-form.component';
 
@@ -31,14 +32,14 @@ describe('TerminalEntryFormComponent', () => {
 		expect(input).toBeTruthy();
 	});
 
-	it('should render the component with FIB flag displayed with the entry reply is a fibonacci number', () => {
-		component.terminalEntry = { state: 'initial', isComplete: true, reply: '1', isReplyFibonacci: true };
+	it(`should render the component with ${FIBONACCI_ALERT} flag displayed when the entry input is a fibonacci number`, () => {
+		component.terminalEntry = { state: 'initial', isComplete: true, input: '1', isInputFibonacci: true };
 		fixture.detectChanges();
 
 		const compiled: HTMLElement = fixture.debugElement.nativeElement;
 		const completedInputs = compiled.querySelectorAll('.terminal-completed-input');
 		const completedInputsArray = Array.from(completedInputs);
-		const hasFIBAlert = completedInputsArray.some(completedInput => completedInput.textContent === 'FIB');
+		const hasFIBAlert = completedInputsArray.some(completedInput => completedInput.textContent === FIBONACCI_ALERT);
 		expect(hasFIBAlert).toBeTruthy();
 	});
 

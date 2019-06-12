@@ -1,5 +1,5 @@
 import { isNumeric } from 'validator';
-import { ITerminalEntryCount, ITerminalEntry } from '../types/terminal-entry';
+import { ITerminalEntryCount, ITerminalEntry } from '../types';
 
 /**
  * @description
@@ -15,16 +15,16 @@ export function generateTerminalMessage(terminalEntries: Array<ITerminalEntry>):
 			return false;
 		}
 
-		const reply = entry.reply;
-		const isReplyNumeric = isNumeric(reply);
+		const input = entry.input;
+		const isInputNumeric = isNumeric(input);
 		const isNotFrequencyEntry = entry.state !== 'frequency';
-		const isValidEntry = isReplyNumeric && isNotFrequencyEntry;
+		const isValidEntry = isInputNumeric && isNotFrequencyEntry;
 
 		return isValidEntry ? entry : false;
 	});
 
 	validTerminalEntries.forEach(entry => {
-		const value = entry.reply;
+		const value = entry.input;
 		const entryCount = entryCounts.find(count => count.value === value);
 		entryCount ? entryCount.frequency++ : entryCounts.push({ frequency: 1, value });
 	});

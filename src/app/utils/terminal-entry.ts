@@ -4,20 +4,20 @@ import {
 	IN_PROGRESS_QUESTION,
 	HALTED_QUESTION,
 	RESUMED_QUESTION
-} from '../constants/terminal-entry-questions';
-import { TTerminalEntryState } from '../types/terminal-entry';
+} from '../constants';
+import { TTerminalEntryState } from '../types';
 
 /**
  * @description
- * Whether the reply string is a keyword.
+ * Whether the input string is a keyword.
  *
- * @param {string} reply	Reply string
+ * @param {string} input	Input string
  */
-export function isTerminalEntryKeyword(reply: string): boolean {
+export function isTerminalEntryKeyword(input: string): boolean {
 	const keywords: Array<string> = ['halt', 'resume', 'quit'];
-	const isReplyKeyword = keywords.indexOf(reply) > -1;
+	const isInputKeyword = keywords.indexOf(input) > -1;
 
-	return isReplyKeyword;
+	return isInputKeyword;
 }
 
 /**

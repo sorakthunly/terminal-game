@@ -1,5 +1,5 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
-import { ITerminalEntry } from 'src/app/types/terminal-entry';
+import { ITerminalEntry } from 'src/app/types';
 
 @Component({
 	selector: 'app-terminal-entry',

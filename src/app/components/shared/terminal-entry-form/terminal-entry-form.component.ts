@@ -1,5 +1,6 @@
 import { Component, Input, ElementRef, ViewChild, HostListener, Output, EventEmitter } from '@angular/core';
-import { ITerminalEntry } from 'src/app/types/terminal-entry';
+import { FIBONACCI_ALERT } from 'src/app/constants';
+import { ITerminalEntry } from 'src/app/types';
 
 @Component({
 	selector: 'app-terminal-entry-form',
@@ -12,6 +13,9 @@ export class TerminalEntryFormComponent {
 
 	/** Submit event on user input completion */
 	@Output() submit: EventEmitter<ITerminalEntry> = new EventEmitter();
+
+	/** Fibonacci alert message */
+	fibonacciAlert = FIBONACCI_ALERT;
 
 	/** Terminal input element reference */
 	@ViewChild('terminalInput', { static: false })

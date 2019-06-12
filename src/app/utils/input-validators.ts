@@ -1,5 +1,5 @@
 import { isNumeric } from 'validator';
-import { ITerminalEntry } from '../types/terminal-entry';
+import { ITerminalEntry } from '../types';
 import { isTerminalEntryKeyword } from './terminal-entry';
 import { isGreaterThanZero } from './validators';
 
@@ -7,26 +7,26 @@ import { isGreaterThanZero } from './validators';
  * @description
  * Check to see if the frequency entry input is invalid.
  *
- * @param {ITerminalEntry} entry	Terminal entry object
+ * @param {ITerminalEntry} terminalEntry	Terminal entry object
  */
-export function isInvalidFrequencyEntry(entry: ITerminalEntry) {
-	const isStateFrequency = entry.state === 'frequency';
-	const isReplyValid = isGreaterThanZero(entry.reply);
+export function isInvalidFrequencyEntry(terminalEntry: ITerminalEntry) {
+	const isStateFrequency = terminalEntry.state === 'frequency';
+	const isInputValid = isGreaterThanZero(terminalEntry.input);
 
-	return isStateFrequency && !isReplyValid;
+	return isStateFrequency && !isInputValid;
 }
 
 /**
  * @description
  * Check to see if the non-frequency entry input is invalid.
  *
- * @param {ITerminalEntry} entry	Terminal entry object
+ * @param {ITerminalEntry} terminalEntry	Terminal entry object
  */
-export function isInvalidNonFrequencyEntry(entry: ITerminalEntry) {
-	const isStateNotFrequency = entry.state !== 'frequency';
-	const isReplyNumeric = isNumeric(entry.reply);
-	const isReplyKeyword = isTerminalEntryKeyword(entry.reply);
-	const isInputValid = isReplyNumeric || isReplyKeyword;
+export function isInvalidNonFrequencyEntry(terminalEntry: ITerminalEntry) {
+	const isStateNotFrequency = terminalEntry.state !== 'frequency';
+	const isInputNumeric = isNumeric(terminalEntry.input);
+	const isInputKeyword = isTerminalEntryKeyword(terminalEntry.input);
+	const isInputValid = isInputNumeric || isInputKeyword;
 
 	return isStateNotFrequency && !isInputValid;
 }
@@ -35,11 +35,11 @@ export function isInvalidNonFrequencyEntry(entry: ITerminalEntry) {
  * @description
  * Check to see if the initial entry input is invalid.
  *
- * @param {ITerminalEntry} entry	Terminal entry object
+ * @param {ITerminalEntry} terminalEntry	Terminal entry object
  */
-export function isInvalidInitialEntry(entry: ITerminalEntry) {
-	const isStateInitial = entry.state === 'initial';
-	const isReplyNumeric = isNumeric(entry.reply);
+export function isInvalidInitialEntry(terminalEntry: ITerminalEntry) {
+	const isStateInitial = terminalEntry.state === 'initial';
+	const isInputNumeric = isNumeric(terminalEntry.input);
 
-	return isStateInitial && !isReplyNumeric;
+	return isStateInitial && !isInputNumeric;
 }

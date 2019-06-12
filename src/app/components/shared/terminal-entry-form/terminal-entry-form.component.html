@@ -4,9 +4,9 @@
 		<span
 			*ngIf="terminalEntry.isComplete"
 			class="terminal-completed-input"
-			[class.text-danger]="terminalEntry.replyErrorMessage"
+			[class.text-danger]="terminalEntry.inputErrorMessage"
 		>
-			{{ terminalEntry.reply }}</span
+			{{ terminalEntry.input }}</span
 		>
 		<input
 			*ngIf="!terminalEntry.isComplete"
@@ -14,14 +14,14 @@
 			appAutoFocus
 			type="text"
 			class="w-100 terminal-line-input"
-			name="reply"
+			name="input"
 			autocomplete="off"
-			[(ngModel)]="terminalEntry.reply"
+			[(ngModel)]="terminalEntry.input"
 		/>
 	</div>
 </form>
 
-<div *ngIf="terminalEntry.isReplyFibonacci" class="d-flex align-items-center justify-content-center-start">
+<div *ngIf="terminalEntry.isInputFibonacci" class="d-flex align-items-center justify-content-center-start">
 	<span class="font-weight-bold terminal-input-delimiter">>></span>
-	<span class="terminal-completed-input">FIB</span>
+	<span class="terminal-completed-input">{{ fibonacciAlert }}</span>
 </div>

@@ -21,8 +21,8 @@ The application should accept an ongoing series of user supplied numbers as inpu
 
 ## What to Expect
 
-- e2e with Protractor is configured by Angular CLI but no tests written
 - Resuable components are small and may not be necessary. They're there to demonstrate components breakdown
+- All tests passed but one test case throws `Not implemented: window.alert` which is a known [jsdom issue](https://github.com/rstacruz/jsdom-global/issues/25)
 
 ## Development server
 

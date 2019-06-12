@@ -2,6 +2,6 @@
 	<app-terminal-entry
 		*ngFor="let terminalEntry of terminalEntries"
 		[terminalEntry]="terminalEntry"
-		(submit)="submit.emit($event)"
+		(submit)="submit($event)"
 	></app-terminal-entry>
 </div>

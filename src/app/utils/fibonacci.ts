@@ -21,14 +21,14 @@ export function generateFibonacciSequence(length: number): Array<number> {
 
 /**
  * @description
- * Check whether an entry reply is part of the given array of fibonacci sequence.
+ * Check whether an entry input is part of the given array of fibonacci sequence.
  *
  * @param {ITerminalEntry} entry	Terminal entry object
  * @param {Array<number>} fibonacciSequence	Given array of fibonacci sequence
  */
 export function isFibonacci(value: string, fibonacciSequence: Array<number>): boolean {
-	const isReplyNumeric = isNumeric(value);
-	if (isReplyNumeric) {
+	const isInputNumeric = isNumeric(value);
+	if (isInputNumeric) {
 		const isInFibonacciSequence = fibonacciSequence.indexOf(Number(value)) > -1;
 
 		return isInFibonacciSequence;

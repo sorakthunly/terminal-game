@@ -1,4 +1,4 @@
-import { FREQUENCY_INPUT_ERROR, INITIAL_INPUT_ERROR, INPUT_ERROR } from '../constants/errors';
+import { FREQUENCY_INPUT_ERROR, INITIAL_INPUT_ERROR, INPUT_ERROR } from '../constants';
 
 /**
  * @description
