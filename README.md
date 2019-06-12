@@ -1,5 +1,7 @@
 ![image](https://user-images.githubusercontent.com/19909685/59242321-6fa60600-8c4e-11e9-8d82-6b2fea6fd668.png)
+
 Live Application with Firebase: https://terminal-game.firebaseapp.com
+
 Live Application with S3: http://terminal-game.s3-website-ap-southeast-2.amazonaws.com
 
 # Terminal Game
